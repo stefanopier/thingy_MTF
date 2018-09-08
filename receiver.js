@@ -29,8 +29,12 @@
   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
  
-
+// motion sensor variables
 var _roll, _pitch, _yaw, _heading, _x, _y, _z;
+
+// environmental variables
+var _temperature, _pressure, _humidity, _tvoc, _eco2;
+var _temperature_last, _pressure_last, _humidity_last, _tvoc_last, _eco2_last;
 
 /************************* OSC */
 
@@ -54,11 +58,9 @@ udp.on("ready", function () {
     console.log("UDP ready");
 });
 
-
 setInterval(function () {
     sendOSC();
-}, 10); //7.5ms
-
+}, 200); // milliseconds
 
 function sendOSC() {
     udp.send({
@@ -90,8 +92,32 @@ function sendOSC() {
         args: [_z]
     });
 
-    //console.log("SENT")
+    if (_temperature_last !== _temperature) {
+        udp.send({ address: "/thingy/temperature", args: [_temperature] });
+        _temperature_last = _temperature;
+    }
 
+    if (_pressure_last !== _pressure) {
+        udp.send({ address: "/thingy/pressure", args: [_pressure] });
+        _pressure_last = _pressure;
+    }
+
+    if (_humidity_last !== _humidity) {
+        udp.send({ address: "/thingy/humidity", args: [_humidity] });
+        _humidity_last = _humidity;
+    }
+
+    if (_tvoc_last !== _tvoc) {
+        udp.send({ address: "/thingy/tvoc", args: [_tvoc] });
+        _tvoc_last = _tvoc;
+    }
+
+    if (_eco2_last !== _eco2) {
+        udp.send({ address: "/thingy/eco2", args: [_eco2] });
+        _eco2_last = _eco2;
+    }
+
+    //console.log("SENT")
 }
 
 /************************* THINGY */
@@ -165,6 +191,33 @@ function onGravityData(gravity) {
     _x = gravity.x;
     _y = gravity.y;
     _z = gravity.z;
+}
+
+function onTemperatureData(temperature) {
+    console.log('Temperature sensor: ' + temperature);
+    _temperature = temperature;
+}
+
+function onPressureData(pressure) {
+    console.log('Pressure sensor: ' + pressure);
+    _pressure = pressure;
+}
+
+function onHumidityData(humidity) {
+    console.log('Humidity sensor: ' + humidity);
+    _humidity = humidity;
+}
+
+function onGasData(gas) {
+    // CO2
+    if(typeof gas.eco2 !== 'undefined')
+        _eco2 = gas.eco2;
+
+    // Total Volatile Organic Compounds
+    if(typeof gas.tvoc !== 'undefined') 
+        _tvoc = gas.tvoc;
+
+    console.log('Gas sensor: eCO2 ' + gas.eco2 + ' - TVOC ' + gas.tvoc );
 }
 
 function onButtonChange(state) {
