@@ -39,7 +39,7 @@ var osc = require("osc");
 var udp = new osc.UDPPort({
     localAddress: "0.0.0.0",
     localPort: 5000, // not receiving, but here's a port anyway
-    remoteAddress: "10.42.0.122", // the other laptop
+    remoteAddress: "127.0.0.1", // the other laptop
 
 //    remoteAddress: "10.37.101.108", // tom
 
