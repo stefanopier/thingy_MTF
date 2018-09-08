@@ -31,6 +31,7 @@
  
 // motion sensor variables
 var _roll, _pitch, _yaw, _heading, _x, _y, _z;
+var _roll_last, _pitch_last, _yaw_last, _heading_last, _x_last, _y_last, _z_last;
 
 // environmental variables
 var _temperature, _pressure, _humidity, _tvoc, _eco2;
@@ -49,7 +50,7 @@ var udp = new osc.UDPPort({
 
 //    remoteAddress: "10.37.101.119", // the other laptop
 
-    remotePort: 30200 // the port to send to
+    remotePort: 8000 // the port to send to
 });
 
 udp.open();
@@ -63,34 +64,43 @@ setInterval(function () {
 }, 200); // milliseconds
 
 function sendOSC() {
-    udp.send({
-        address: "/thingy/roll",
-        args: [_roll]
-    });
-    udp.send({
-        address: "/thingy/pitch",
-        args: [_pitch]
-    });
-    udp.send({
-        address: "/thingy/yaw",
-        args: [_yaw]
-    });
-    udp.send({
-        address: "/thingy/heading",
-        args: [_heading]
-    });
-    udp.send({
-        address: "/thingy/x",
-        args: [_x]
-    });
-    udp.send({
-        address: "/thingy/y",
-        args: [_y]
-    });
-    udp.send({
-        address: "/thingy/z",
-        args: [_z]
-    });
+
+    if (_roll_last !== _roll) {
+        udp.send({ address: "/thingy/roll", args: [_roll] });
+        _roll_last = _roll;
+    }
+
+    if (_pitch_last !== _pitch) {              
+        udp.send({ address: "/thingy/pitch", args: [_pitch] });
+        _pitch_last = _pitch;
+    }
+
+    if (_yaw_last !== _yaw) {    
+        udp.send({ address: "/thingy/yaw", args: [_yaw] });
+        _yaw_last = _yaw;
+    }
+
+    if (_heading_last !== _heading) {
+        udp.send({ address: "/thingy/heading", args: [_heading] });
+        _heading_last = _heading;
+    }
+
+    if (_x_last !== _x) {
+        udp.send({ address: "/thingy/x", args: [_x] });
+        _x_last = _x;
+    }
+
+    if (_y_last !== _y) {
+        udp.send({ address: "/thingy/y", args: [_y] });
+        _y_last = _y;
+    }
+
+    if (_z_last !== _z) {
+        udp.send({ address: "/thingy/z", args: [_z] });
+        _z_last = _z;
+    }
+
+
 
     if (_temperature_last !== _temperature) {
         udp.send({ address: "/thingy/temperature", args: [_temperature] });
